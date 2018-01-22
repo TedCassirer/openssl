@@ -31,7 +31,7 @@ int SHA224_Init(SHA256_CTX *c)
     return 1;
 }
 
-int SHA256_Init(SHA256_CTX *c)
+int SHA256_Init3(SHA256_CTX *c)
 {
     memset(c, 0, sizeof(*c));
     c->h[0] = 0x6a09e667UL;
@@ -54,8 +54,8 @@ unsigned char *SHA224(const unsigned char *d, size_t n, unsigned char *md)
     if (md == NULL)
         md = m;
     SHA224_Init(&c);
-    SHA256_Update(&c, d, n);
-    SHA256_Final(md, &c);
+    SHA256_Update3(&c, d, n);
+    SHA256_Final3(md, &c);
     OPENSSL_cleanse(&c, sizeof(c));
     return (md);
 }
@@ -67,21 +67,21 @@ unsigned char *SHA256(const unsigned char *d, size_t n, unsigned char *md)
 
     if (md == NULL)
         md = m;
-    SHA256_Init(&c);
-    SHA256_Update(&c, d, n);
-    SHA256_Final(md, &c);
+    SHA256_Init3(&c);
+    SHA256_Update3(&c, d, n);
+    SHA256_Final3(md, &c);
     OPENSSL_cleanse(&c, sizeof(c));
     return (md);
 }
 
 int SHA224_Update(SHA256_CTX *c, const void *data, size_t len)
 {
-    return SHA256_Update(c, data, len);
+    return SHA256_Update3(c, data, len);
 }
 
 int SHA224_Final(unsigned char *md, SHA256_CTX *c)
 {
-    return SHA256_Final(md, c);
+    return SHA256_Final3(md, c);
 }
 
 #define DATA_ORDER_IS_BIG_ENDIAN
@@ -119,9 +119,9 @@ int SHA224_Final(unsigned char *md, SHA256_CTX *c)
         }                               \
         } while (0)
 
-#define HASH_UPDATE             SHA256_Update
+#define HASH_UPDATE             SHA256_Update3
 #define HASH_TRANSFORM          SHA256_Transform
-#define HASH_FINAL              SHA256_Final
+#define HASH_FINAL              SHA256_Final3
 #define HASH_BLOCK_DATA_ORDER   sha256_block_data_order
 #ifndef SHA256_ASM
 static

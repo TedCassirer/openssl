@@ -170,7 +170,7 @@ int ssl3_cbc_digest_record(const EVP_MD_CTX *ctx,
 
     switch (EVP_MD_CTX_type(ctx)) {
     case NID_md5:
-        if (MD5_Init((MD5_CTX *)md_state.c) <= 0)
+        if (MD5_Init2((MD5_CTX *)md_state.c) <= 0)
             return 0;
         md_final_raw = tls1_md5_final_raw;
         md_transform =
@@ -180,7 +180,7 @@ int ssl3_cbc_digest_record(const EVP_MD_CTX *ctx,
         length_is_big_endian = 0;
         break;
     case NID_sha1:
-        if (SHA1_Init((SHA_CTX *)md_state.c) <= 0)
+        if (SHA1_Init2((SHA_CTX *)md_state.c) <= 0)
             return 0;
         md_final_raw = tls1_sha1_final_raw;
         md_transform =
@@ -196,7 +196,7 @@ int ssl3_cbc_digest_record(const EVP_MD_CTX *ctx,
         md_size = 224 / 8;
         break;
     case NID_sha256:
-        if (SHA256_Init((SHA256_CTX *)md_state.c) <= 0)
+        if (SHA256_Init3((SHA256_CTX *)md_state.c) <= 0)
             return 0;
         md_final_raw = tls1_sha256_final_raw;
         md_transform =
@@ -204,7 +204,7 @@ int ssl3_cbc_digest_record(const EVP_MD_CTX *ctx,
         md_size = 32;
         break;
     case NID_sha384:
-        if (SHA384_Init((SHA512_CTX *)md_state.c) <= 0)
+        if (SHA384_Init3((SHA512_CTX *)md_state.c) <= 0)
             return 0;
         md_final_raw = tls1_sha512_final_raw;
         md_transform =
@@ -214,7 +214,7 @@ int ssl3_cbc_digest_record(const EVP_MD_CTX *ctx,
         md_length_size = 16;
         break;
     case NID_sha512:
-        if (SHA512_Init((SHA512_CTX *)md_state.c) <= 0)
+        if (SHA512_Init3((SHA512_CTX *)md_state.c) <= 0)
             return 0;
         md_final_raw = tls1_sha512_final_raw;
         md_transform =

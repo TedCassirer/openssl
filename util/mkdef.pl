@@ -982,15 +982,15 @@ sub do_defs
 	$platform{"PEM_write_P8_PRIV_KEY_INFO"} = "VMS";
 	$platform{"EVP_sha384"} = "!VMSVAX";
 	$platform{"EVP_sha512"} = "!VMSVAX";
-	$platform{"SHA384_Init"} = "!VMSVAX";
+	$platform{"SHA384_Init3"} = "!VMSVAX";
 	$platform{"SHA384_Transform"} = "!VMSVAX";
-	$platform{"SHA384_Update"} = "!VMSVAX";
-	$platform{"SHA384_Final"} = "!VMSVAX";
+	$platform{"SHA384_Update3"} = "!VMSVAX";
+	$platform{"SHA384_Final3"} = "!VMSVAX";
 	$platform{"SHA384"} = "!VMSVAX";
-	$platform{"SHA512_Init"} = "!VMSVAX";
+	$platform{"SHA512_Init3"} = "!VMSVAX";
 	$platform{"SHA512_Transform"} = "!VMSVAX";
-	$platform{"SHA512_Update"} = "!VMSVAX";
-	$platform{"SHA512_Final"} = "!VMSVAX";
+	$platform{"SHA512_Update3"} = "!VMSVAX";
+	$platform{"SHA512_Final3"} = "!VMSVAX";
 	$platform{"SHA512"} = "!VMSVAX";
 
 

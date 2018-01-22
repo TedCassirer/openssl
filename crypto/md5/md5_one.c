@@ -23,10 +23,10 @@ unsigned char *MD5(const unsigned char *d, size_t n, unsigned char *md)
 
     if (md == NULL)
         md = m;
-    if (!MD5_Init(&c))
+    if (!MD5_Init2(&c))
         return NULL;
 #ifndef CHARSET_EBCDIC
-    MD5_Update(&c, d, n);
+    MD5_Update2(&c, d, n);
 #else
     {
         char temp[1024];
@@ -35,13 +35,13 @@ unsigned char *MD5(const unsigned char *d, size_t n, unsigned char *md)
         while (n > 0) {
             chunk = (n > sizeof(temp)) ? sizeof(temp) : n;
             ebcdic2ascii(temp, d, chunk);
-            MD5_Update(&c, temp, chunk);
+            MD5_Update2(&c, temp, chunk);
             n -= chunk;
             d += chunk;
         }
     }
 #endif
-    MD5_Final(md, &c);
+    MD5_Final2(md, &c);
     OPENSSL_cleanse(&c, sizeof(c)); /* security consideration */
     return (md);
 }

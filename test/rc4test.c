@@ -149,12 +149,12 @@ int main(int argc, char *argv[])
 
         RC4_set_key(&key, keys[0][0], &(keys[3][1]));
         memset(buf, 0, sizeof(buf));
-        SHA1_Init(&c);
+        SHA1_Init2(&c);
         for (i = 0; i < 2571; i++) {
             RC4(&key, sizeof(buf), buf, buf);
-            SHA1_Update(&c, buf, sizeof(buf));
+            SHA1_Update2(&c, buf, sizeof(buf));
         }
-        SHA1_Final(md, &c);
+        SHA1_Final2(md, &c);
 
         if (memcmp(md, expected, sizeof(md))) {
             printf("error in RC4 bulk test\n");

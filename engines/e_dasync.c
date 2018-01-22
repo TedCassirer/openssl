@@ -478,7 +478,7 @@ static int dasync_sha1_init(EVP_MD_CTX *ctx)
 {
     dummy_pause_job();
 
-    return SHA1_Init(data(ctx));
+    return SHA1_Init2(data(ctx));
 }
 
 static int dasync_sha1_update(EVP_MD_CTX *ctx, const void *data,
@@ -486,14 +486,14 @@ static int dasync_sha1_update(EVP_MD_CTX *ctx, const void *data,
 {
     dummy_pause_job();
 
-    return SHA1_Update(data(ctx), data, (size_t)count);
+    return SHA1_Update2(data(ctx), data, (size_t)count);
 }
 
 static int dasync_sha1_final(EVP_MD_CTX *ctx, unsigned char *md)
 {
     dummy_pause_job();
 
-    return SHA1_Final(md, data(ctx));
+    return SHA1_Final2(md, data(ctx));
 }
 
 /*

@@ -3,7 +3,7 @@
 =head1 NAME
 
 MD2, MD4, MD5, MD2_Init, MD2_Update, MD2_Final, MD4_Init, MD4_Update,
-MD4_Final, MD5_Init, MD5_Update, MD5_Final - MD2, MD4, and MD5 hash functions
+MD4_Final, MD5_Init2, MD5_Update2, MD5_Final2 - MD2, MD4, and MD5 hash functions
 
 =head1 SYNOPSIS
 
@@ -34,10 +34,10 @@ MD4_Final, MD5_Init, MD5_Update, MD5_Final - MD2, MD4, and MD5 hash functions
  unsigned char *MD5(const unsigned char *d, unsigned long n,
                   unsigned char *md);
 
- int MD5_Init(MD5_CTX *c);
- int MD5_Update(MD5_CTX *c, const void *data,
+ int MD5_Init2(MD5_CTX *c);
+ int MD5_Update2(MD5_CTX *c, const void *data,
                   unsigned long len);
- int MD5_Final(unsigned char *md, MD5_CTX *c);
+ int MD5_Final2(unsigned char *md, MD5_CTX *c);
 
 =head1 DESCRIPTION
 
@@ -60,8 +60,8 @@ be hashed (B<len> bytes at B<data>).
 MD2_Final() places the message digest in B<md>, which must have space
 for MD2_DIGEST_LENGTH == 16 bytes of output, and erases the B<MD2_CTX>.
 
-MD4_Init(), MD4_Update(), MD4_Final(), MD5_Init(), MD5_Update(), and
-MD5_Final() are analogous using an B<MD4_CTX> and B<MD5_CTX> structure.
+MD4_Init(), MD4_Update(), MD4_Final(), MD5_Init2(), MD5_Update2(), and
+MD5_Final2() are analogous using an B<MD4_CTX> and B<MD5_CTX> structure.
 
 Applications should use the higher level functions
 L<EVP_DigestInit(3)>
@@ -78,7 +78,7 @@ preferred.
 MD2(), MD4(), and MD5() return pointers to the hash value.
 
 MD2_Init(), MD2_Update(), MD2_Final(), MD4_Init(), MD4_Update(),
-MD4_Final(), MD5_Init(), MD5_Update(), and MD5_Final() return 1 for
+MD4_Final(), MD5_Init2(), MD5_Update2(), and MD5_Final2() return 1 for
 success, 0 otherwise.
 
 =head1 CONFORMING TO

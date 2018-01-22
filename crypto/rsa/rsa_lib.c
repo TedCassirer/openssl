@@ -117,11 +117,11 @@ RSA *RSA_new_method(ENGINE *engine)
     return ret;
 
 err:
-    RSA_free(ret);
+    RSA_free2(ret);
     return NULL;
 }
 
-void RSA_free(RSA *r)
+void RSA_free2(RSA *r)
 {
     int i;
 

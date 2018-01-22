@@ -2,18 +2,18 @@
 
 =head1 NAME
 
-SHA1, SHA1_Init, SHA1_Update, SHA1_Final, SHA224, SHA224_Init, SHA224_Update,
-SHA224_Final, SHA256, SHA256_Init, SHA256_Update, SHA256_Final, SHA384,
-SHA384_Init, SHA384_Update, SHA384_Final, SHA512, SHA512_Init, SHA512_Update,
-SHA512_Final - Secure Hash Algorithm
+SHA1, SHA1_Init2, SHA1_Update2, SHA1_Final2, SHA224, SHA224_Init, SHA224_Update,
+SHA224_Final, SHA256, SHA256_Init3, SHA256_Update3, SHA256_Final3, SHA384,
+SHA384_Init3, SHA384_Update3, SHA384_Final3, SHA512, SHA512_Init3, SHA512_Update3,
+SHA512_Final3 - Secure Hash Algorithm
 
 =head1 SYNOPSIS
 
  #include <openssl/sha.h>
 
- int SHA1_Init(SHA_CTX *c);
- int SHA1_Update(SHA_CTX *c, const void *data, size_t len);
- int SHA1_Final(unsigned char *md, SHA_CTX *c);
+ int SHA1_Init2(SHA_CTX *c);
+ int SHA1_Update2(SHA_CTX *c, const void *data, size_t len);
+ int SHA1_Final2(unsigned char *md, SHA_CTX *c);
  unsigned char *SHA1(const unsigned char *d, size_t n,
       unsigned char *md);
 
@@ -23,21 +23,21 @@ SHA512_Final - Secure Hash Algorithm
  unsigned char *SHA224(const unsigned char *d, size_t n,
       unsigned char *md);
 
- int SHA256_Init(SHA256_CTX *c);
- int SHA256_Update(SHA256_CTX *c, const void *data, size_t len);
- int SHA256_Final(unsigned char *md, SHA256_CTX *c);
+ int SHA256_Init3(SHA256_CTX *c);
+ int SHA256_Update3(SHA256_CTX *c, const void *data, size_t len);
+ int SHA256_Final3(unsigned char *md, SHA256_CTX *c);
  unsigned char *SHA256(const unsigned char *d, size_t n,
       unsigned char *md);
 
- int SHA384_Init(SHA512_CTX *c);
- int SHA384_Update(SHA512_CTX *c, const void *data, size_t len);
- int SHA384_Final(unsigned char *md, SHA512_CTX *c);
+ int SHA384_Init3(SHA512_CTX *c);
+ int SHA384_Update3(SHA512_CTX *c, const void *data, size_t len);
+ int SHA384_Final3(unsigned char *md, SHA512_CTX *c);
  unsigned char *SHA384(const unsigned char *d, size_t n,
       unsigned char *md);
 
- int SHA512_Init(SHA512_CTX *c);
- int SHA512_Update(SHA512_CTX *c, const void *data, size_t len);
- int SHA512_Final(unsigned char *md, SHA512_CTX *c);
+ int SHA512_Init3(SHA512_CTX *c);
+ int SHA512_Update3(SHA512_CTX *c, const void *data, size_t len);
+ int SHA512_Final3(unsigned char *md, SHA512_CTX *c);
  unsigned char *SHA512(const unsigned char *d, size_t n,
       unsigned char *md);
 
@@ -58,12 +58,12 @@ is placed in a static array. Note: setting B<md> to NULL is B<not thread safe>.
 The following functions may be used if the message is not completely
 stored in memory:
 
-SHA1_Init() initializes a B<SHA_CTX> structure.
+SHA1_Init2() initializes a B<SHA_CTX> structure.
 
-SHA1_Update() can be called repeatedly with chunks of the message to
+SHA1_Update2() can be called repeatedly with chunks of the message to
 be hashed (B<len> bytes at B<data>).
 
-SHA1_Final() places the message digest in B<md>, which must have space
+SHA1_Final2() places the message digest in B<md>, which must have space
 for SHA_DIGEST_LENGTH == 20 bytes of output, and erases the B<SHA_CTX>.
 
 The SHA224, SHA256, SHA384 and SHA512 families of functions operate in the
@@ -83,7 +83,7 @@ used only when backward compatibility is required.
 SHA1(), SHA224(), SHA256(), SHA384() and SHA512() return a pointer to the hash
 value.
 
-SHA1_Init(), SHA1_Update() and SHA1_Final() and equivalent SHA224, SHA256,
+SHA1_Init2(), SHA1_Update2() and SHA1_Final2() and equivalent SHA224, SHA256,
 SHA384 and SHA512 functions return 1 for success, 0 otherwise.
 
 =head1 CONFORMING TO

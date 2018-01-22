@@ -76,7 +76,7 @@ static int aesni_cbc_hmac_sha1_init_key(EVP_CIPHER_CTX *ctx,
                                     EVP_CIPHER_CTX_key_length(ctx) * 8,
                                     &key->ks);
 
-    SHA1_Init(&key->head);      /* handy when benchmarking */
+    SHA1_Init2(&key->head);      /* handy when benchmarking */
     key->tail = key->head;
     key->md = key->head;
 
@@ -103,7 +103,7 @@ static void sha1_update(SHA_CTX *c, const void *data, size_t len)
         res = SHA_CBLOCK - res;
         if (len < res)
             res = len;
-        SHA1_Update(c, ptr, res);
+        SHA1_Update2(c, ptr, res);
         ptr += res;
         len -= res;
     }
@@ -122,13 +122,13 @@ static void sha1_update(SHA_CTX *c, const void *data, size_t len)
     }
 
     if (res)
-        SHA1_Update(c, ptr, res);
+        SHA1_Update2(c, ptr, res);
 }
 
-# ifdef SHA1_Update
-#  undef SHA1_Update
+# ifdef SHA1_Update2
+#  undef SHA1_Update2
 # endif
-# define SHA1_Update sha1_update
+# define SHA1_Update2 sha1_update
 
 # if !defined(OPENSSL_NO_MULTIBLOCK)
 
@@ -431,7 +431,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 # if defined(STITCHED_CALL)
         if (plen > (sha_off + iv)
             && (blocks = (plen - (sha_off + iv)) / SHA_CBLOCK)) {
-            SHA1_Update(&key->md, in + iv, sha_off);
+            SHA1_Update2(&key->md, in + iv, sha_off);
 
             aesni_cbc_sha1_enc(in, out, blocks, &key->ks,
                                EVP_CIPHER_CTX_iv_noconst(ctx),
@@ -448,17 +448,17 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
         }
 # endif
         sha_off += iv;
-        SHA1_Update(&key->md, in + sha_off, plen - sha_off);
+        SHA1_Update2(&key->md, in + sha_off, plen - sha_off);
 
         if (plen != len) {      /* "TLS" mode of operation */
             if (in != out)
                 memcpy(out + aes_off, in + aes_off, plen - aes_off);
 
             /* calculate HMAC and append it to payload */
-            SHA1_Final(out + plen, &key->md);
+            SHA1_Final2(out + plen, &key->md);
             key->md = key->tail;
-            SHA1_Update(&key->md, out + plen, SHA_DIGEST_LENGTH);
-            SHA1_Final(out + plen, &key->md);
+            SHA1_Update2(&key->md, out + plen, SHA_DIGEST_LENGTH);
+            SHA1_Final2(out + plen, &key->md);
 
             /* pad the payload|hmac */
             plen += SHA_DIGEST_LENGTH;
@@ -540,7 +540,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 
             /* calculate HMAC */
             key->md = key->head;
-            SHA1_Update(&key->md, key->aux.tls_aad, plen);
+            SHA1_Update2(&key->md, key->aux.tls_aad, plen);
 
 # if defined(STITCHED_DECRYPT_CALL)
             if (stitch) {
@@ -550,7 +550,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 
                 aesni_cbc_encrypt(in, out, aes_off, &key->ks, ctx->iv, 0);
 
-                SHA1_Update(&key->md, out, sha_off);
+                SHA1_Update2(&key->md, out, sha_off);
                 aesni256_cbc_sha1_dec(in + aes_off,
                                       out + aes_off, blocks, &key->ks,
                                       ctx->iv, &key->md, out + sha_off);
@@ -570,7 +570,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
             if (len >= (256 + SHA_CBLOCK)) {
                 j = (len - (256 + SHA_CBLOCK)) & (0 - SHA_CBLOCK);
                 j += SHA_CBLOCK - key->md.num;
-                SHA1_Update(&key->md, out, j);
+                SHA1_Update2(&key->md, out, j);
                 out += j;
                 len -= j;
                 inp_len -= j;
@@ -660,9 +660,9 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 #  endif
             len += SHA_DIGEST_LENGTH;
 # else
-            SHA1_Update(&key->md, out, inp_len);
+            SHA1_Update2(&key->md, out, inp_len);
             res = key->md.num;
-            SHA1_Final(pmac->c, &key->md);
+            SHA1_Final2(pmac->c, &key->md);
 
             {
                 unsigned int inp_blocks, pad_blocks;
@@ -680,8 +680,8 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
             }
 # endif
             key->md = key->tail;
-            SHA1_Update(&key->md, pmac->c, SHA_DIGEST_LENGTH);
-            SHA1_Final(pmac->c, &key->md);
+            SHA1_Update2(&key->md, pmac->c, SHA_DIGEST_LENGTH);
+            SHA1_Final2(pmac->c, &key->md);
 
             /* verify HMAC */
             out += inp_len;
@@ -734,7 +734,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
                 aes_off = len - blocks * SHA_CBLOCK;
 
                 aesni_cbc_encrypt(in, out, aes_off, &key->ks, ctx->iv, 0);
-                SHA1_Update(&key->md, out, sha_off);
+                SHA1_Update2(&key->md, out, sha_off);
                 aesni256_cbc_sha1_dec(in + aes_off,
                                       out + aes_off, blocks, &key->ks,
                                       ctx->iv, &key->md, out + sha_off);
@@ -753,7 +753,7 @@ static int aesni_cbc_hmac_sha1_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
                 aesni_cbc_encrypt(in, out, len, &key->ks,
                                   EVP_CIPHER_CTX_iv_noconst(ctx), 0);
 
-            SHA1_Update(&key->md, out, len);
+            SHA1_Update2(&key->md, out, len);
         }
     }
 
@@ -774,22 +774,22 @@ static int aesni_cbc_hmac_sha1_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
             memset(hmac_key, 0, sizeof(hmac_key));
 
             if (arg > (int)sizeof(hmac_key)) {
-                SHA1_Init(&key->head);
-                SHA1_Update(&key->head, ptr, arg);
-                SHA1_Final(hmac_key, &key->head);
+                SHA1_Init2(&key->head);
+                SHA1_Update2(&key->head, ptr, arg);
+                SHA1_Final2(hmac_key, &key->head);
             } else {
                 memcpy(hmac_key, ptr, arg);
             }
 
             for (i = 0; i < sizeof(hmac_key); i++)
                 hmac_key[i] ^= 0x36; /* ipad */
-            SHA1_Init(&key->head);
-            SHA1_Update(&key->head, hmac_key, sizeof(hmac_key));
+            SHA1_Init2(&key->head);
+            SHA1_Update2(&key->head, hmac_key, sizeof(hmac_key));
 
             for (i = 0; i < sizeof(hmac_key); i++)
                 hmac_key[i] ^= 0x36 ^ 0x5c; /* opad */
-            SHA1_Init(&key->tail);
-            SHA1_Update(&key->tail, hmac_key, sizeof(hmac_key));
+            SHA1_Init2(&key->tail);
+            SHA1_Update2(&key->tail, hmac_key, sizeof(hmac_key));
 
             OPENSSL_cleanse(hmac_key, sizeof(hmac_key));
 
@@ -814,7 +814,7 @@ static int aesni_cbc_hmac_sha1_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
                     p[arg - 1] = len;
                 }
                 key->md = key->head;
-                SHA1_Update(&key->md, p, arg);
+                SHA1_Update2(&key->md, p, arg);
 
                 return (int)(((len + SHA_DIGEST_LENGTH +
                                AES_BLOCK_SIZE) & -AES_BLOCK_SIZE)
@@ -857,7 +857,7 @@ static int aesni_cbc_hmac_sha1_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
                     return -1;
 
                 key->md = key->head;
-                SHA1_Update(&key->md, param->inp, 13);
+                SHA1_Update2(&key->md, param->inp, 13);
 
                 x4 = 4 * n4x;
                 n4x += 1;

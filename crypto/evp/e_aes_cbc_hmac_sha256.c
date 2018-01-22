@@ -73,7 +73,7 @@ static int aesni_cbc_hmac_sha256_init_key(EVP_CIPHER_CTX *ctx,
                                     EVP_CIPHER_CTX_key_length(ctx) * 8,
                                     &key->ks);
 
-    SHA256_Init(&key->head);    /* handy when benchmarking */
+    SHA256_Init3(&key->head);    /* handy when benchmarking */
     key->tail = key->head;
     key->md = key->head;
 
@@ -99,7 +99,7 @@ static void sha256_update(SHA256_CTX *c, const void *data, size_t len)
         res = SHA256_CBLOCK - res;
         if (len < res)
             res = len;
-        SHA256_Update(c, ptr, res);
+        SHA256_Update3(c, ptr, res);
         ptr += res;
         len -= res;
     }
@@ -118,13 +118,13 @@ static void sha256_update(SHA256_CTX *c, const void *data, size_t len)
     }
 
     if (res)
-        SHA256_Update(c, ptr, res);
+        SHA256_Update3(c, ptr, res);
 }
 
-# ifdef SHA256_Update
-#  undef SHA256_Update
+# ifdef SHA256_Update3
+#  undef SHA256_Update3
 # endif
-# define SHA256_Update sha256_update
+# define SHA256_Update3 sha256_update
 
 # if !defined(OPENSSL_NO_MULTIBLOCK)
 
@@ -459,7 +459,7 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
              | (OPENSSL_ia32cap_P[0] & (1<<30))) &&    /* "Intel CPU"? */
             plen > (sha_off + iv) &&
             (blocks = (plen - (sha_off + iv)) / SHA256_CBLOCK)) {
-            SHA256_Update(&key->md, in + iv, sha_off);
+            SHA256_Update3(&key->md, in + iv, sha_off);
 
             (void)aesni_cbc_sha256_enc(in, out, blocks, &key->ks,
                                        EVP_CIPHER_CTX_iv_noconst(ctx),
@@ -476,17 +476,17 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
         }
 # endif
         sha_off += iv;
-        SHA256_Update(&key->md, in + sha_off, plen - sha_off);
+        SHA256_Update3(&key->md, in + sha_off, plen - sha_off);
 
         if (plen != len) {      /* "TLS" mode of operation */
             if (in != out)
                 memcpy(out + aes_off, in + aes_off, plen - aes_off);
 
             /* calculate HMAC and append it to payload */
-            SHA256_Final(out + plen, &key->md);
+            SHA256_Final3(out + plen, &key->md);
             key->md = key->tail;
-            SHA256_Update(&key->md, out + plen, SHA256_DIGEST_LENGTH);
-            SHA256_Final(out + plen, &key->md);
+            SHA256_Update3(&key->md, out + plen, SHA256_DIGEST_LENGTH);
+            SHA256_Final3(out + plen, &key->md);
 
             /* pad the payload|hmac */
             plen += SHA256_DIGEST_LENGTH;
@@ -550,14 +550,14 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
 
             /* calculate HMAC */
             key->md = key->head;
-            SHA256_Update(&key->md, key->aux.tls_aad, plen);
+            SHA256_Update3(&key->md, key->aux.tls_aad, plen);
 
 # if 1
             len -= SHA256_DIGEST_LENGTH; /* amend mac */
             if (len >= (256 + SHA256_CBLOCK)) {
                 j = (len - (256 + SHA256_CBLOCK)) & (0 - SHA256_CBLOCK);
                 j += SHA256_CBLOCK - key->md.num;
-                SHA256_Update(&key->md, out, j);
+                SHA256_Update3(&key->md, out, j);
                 out += j;
                 len -= j;
                 inp_len -= j;
@@ -662,9 +662,9 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
 #  endif
             len += SHA256_DIGEST_LENGTH;
 # else
-            SHA256_Update(&key->md, out, inp_len);
+            SHA256_Update3(&key->md, out, inp_len);
             res = key->md.num;
-            SHA256_Final(pmac->c, &key->md);
+            SHA256_Final3(pmac->c, &key->md);
 
             {
                 unsigned int inp_blocks, pad_blocks;
@@ -682,8 +682,8 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
             }
 # endif
             key->md = key->tail;
-            SHA256_Update(&key->md, pmac->c, SHA256_DIGEST_LENGTH);
-            SHA256_Final(pmac->c, &key->md);
+            SHA256_Update3(&key->md, pmac->c, SHA256_DIGEST_LENGTH);
+            SHA256_Final3(pmac->c, &key->md);
 
             /* verify HMAC */
             out += inp_len;
@@ -728,7 +728,7 @@ static int aesni_cbc_hmac_sha256_cipher(EVP_CIPHER_CTX *ctx,
 # endif
             return ret;
         } else {
-            SHA256_Update(&key->md, out, len);
+            SHA256_Update3(&key->md, out, len);
         }
     }
 
@@ -753,22 +753,22 @@ static int aesni_cbc_hmac_sha256_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
                 return -1;
 
             if (u_arg > sizeof(hmac_key)) {
-                SHA256_Init(&key->head);
-                SHA256_Update(&key->head, ptr, arg);
-                SHA256_Final(hmac_key, &key->head);
+                SHA256_Init3(&key->head);
+                SHA256_Update3(&key->head, ptr, arg);
+                SHA256_Final3(hmac_key, &key->head);
             } else {
                 memcpy(hmac_key, ptr, arg);
             }
 
             for (i = 0; i < sizeof(hmac_key); i++)
                 hmac_key[i] ^= 0x36; /* ipad */
-            SHA256_Init(&key->head);
-            SHA256_Update(&key->head, hmac_key, sizeof(hmac_key));
+            SHA256_Init3(&key->head);
+            SHA256_Update3(&key->head, hmac_key, sizeof(hmac_key));
 
             for (i = 0; i < sizeof(hmac_key); i++)
                 hmac_key[i] ^= 0x36 ^ 0x5c; /* opad */
-            SHA256_Init(&key->tail);
-            SHA256_Update(&key->tail, hmac_key, sizeof(hmac_key));
+            SHA256_Init3(&key->tail);
+            SHA256_Update3(&key->tail, hmac_key, sizeof(hmac_key));
 
             OPENSSL_cleanse(hmac_key, sizeof(hmac_key));
 
@@ -791,7 +791,7 @@ static int aesni_cbc_hmac_sha256_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
                     p[arg - 1] = len;
                 }
                 key->md = key->head;
-                SHA256_Update(&key->md, p, arg);
+                SHA256_Update3(&key->md, p, arg);
 
                 return (int)(((len + SHA256_DIGEST_LENGTH +
                                AES_BLOCK_SIZE) & -AES_BLOCK_SIZE)
@@ -837,7 +837,7 @@ static int aesni_cbc_hmac_sha256_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg,
                     return -1;
 
                 key->md = key->head;
-                SHA256_Update(&key->md, param->inp, 13);
+                SHA256_Update3(&key->md, param->inp, 13);
 
                 x4 = 4 * n4x;
                 n4x += 1;

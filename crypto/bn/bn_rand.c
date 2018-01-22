@@ -231,12 +231,12 @@ int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
     for (done = 0; done < num_k_bytes;) {
         if (RAND_bytes(random_bytes, sizeof(random_bytes)) != 1)
             goto err;
-        SHA512_Init(&sha);
-        SHA512_Update(&sha, &done, sizeof(done));
-        SHA512_Update(&sha, private_bytes, sizeof(private_bytes));
-        SHA512_Update(&sha, message, message_len);
-        SHA512_Update(&sha, random_bytes, sizeof(random_bytes));
-        SHA512_Final(digest, &sha);
+        SHA512_Init3(&sha);
+        SHA512_Update3(&sha, &done, sizeof(done));
+        SHA512_Update3(&sha, private_bytes, sizeof(private_bytes));
+        SHA512_Update3(&sha, message, message_len);
+        SHA512_Update3(&sha, random_bytes, sizeof(random_bytes));
+        SHA512_Final3(digest, &sha);
 
         todo = num_k_bytes - done;
         if (todo > SHA512_DIGEST_LENGTH)
